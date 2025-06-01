@@ -1,7 +1,7 @@
-import React from 'react';
-import type { NavbarProps } from '../schema/types';
+import { setSearchQuery, useSearchQuery } from './searchStore';
 
-const Navbar: React.FC<NavbarProps> = ({ searchQuery, setSearchQuery }) => {
+const Navbar = () => {
+  const searchQuery = useSearchQuery();
   return (
     <nav className="flex w-full items-center justify-between border-b bg-white px-4 py-3">
       <div className="text-xl font-bold text-teal-600">JobTracker</div>

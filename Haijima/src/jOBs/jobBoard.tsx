@@ -1,24 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import JobCard from './jobCard';
 import JobModal from './jobModal';
-import type { JOB, JobStatus } from '../schema/types';
-import { addJob } from '../api/joBReq';
+import { statuses, type JOB, type JobStatus } from '../schema/types';
+import { addNewJob, useJobStore } from './JobsTORE';
+import { useSearchQuery } from '../components/searchStore';
 
-type JobBoardProps = {
-  jobs: JOB[]; //Job is your custom type, and Job[] tells TypeScript:
-
-  //"This is an array where every element must match the Job type."
-  searchQuery: string;
-  statuses: JobStatus[];
-};
-
-const JobBoard: React.FC<JobBoardProps> = ({ jobs, searchQuery, statuses }) => {
+const JobBoard = () => {
+  const searchQuery = useSearchQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleSaveJob = async (Job: Omit<JOB, 'id'>) => {
+  const jobs = useJobStore();
+  const handleSaveJob = async (JoB: Omit<JOB, 'id'>) => {
     try {
-      const savedJob = await addJob(Job); // sends the job to backend
-      console.log(savedJob);
+      await addNewJob(JoB);
+      // sends the job to backend
+
       setIsModalOpen(false);
     } catch (error) {
       console.error('Failed to save job:', error);
@@ -39,7 +34,7 @@ const JobBoard: React.FC<JobBoardProps> = ({ jobs, searchQuery, statuses }) => {
 
       {/* Job Columns */}
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
-        {statuses.map((status) => (
+        {statuses.map((status: JobStatus) => (
           <div key={status} className="rounded-xl bg-gray-50 p-4 shadow-sm">
             <h2 className="mb-4 text-xl font-semibold text-gray-700">
               {status} Jobs

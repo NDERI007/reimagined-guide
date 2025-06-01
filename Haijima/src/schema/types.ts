@@ -1,9 +1,8 @@
-export type NavbarProps = {
-  searchQuery: string;
-  setSearchQuery: (value: string) => void;
-};
+// types.ts
 
-export type JobStatus = 'Saved' | 'Interview' | 'Rejected';
+export const statuses = ['Saved', 'Interview', 'Rejected'] as const;
+
+export type JobStatus = (typeof statuses)[number];
 
 export type JOB = {
   id: number;
