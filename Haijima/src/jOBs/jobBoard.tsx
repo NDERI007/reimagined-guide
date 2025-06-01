@@ -26,7 +26,7 @@ const JobBoard = () => {
       <div className="flex justify-end p-4">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          className="rounded-md bg-teal-600 px-4 py-2 text-white hover:bg-teal-500"
         >
           Add Job
         </button>

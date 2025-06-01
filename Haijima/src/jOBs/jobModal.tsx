@@ -32,25 +32,25 @@ const JobModal: React.FC<{
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold">Add New Job</h2>
         <input
-          className="mb-2 w-full rounded border p-2"
+          className="mb-2 w-full rounded border border-gray-300 p-2 hover:border-emerald-200"
           placeholder="Job Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <input
-          className="mb-2 w-full rounded border p-2"
+          className="mb-2 w-full rounded border border-gray-300 p-2 hover:border-emerald-200"
           placeholder="Company"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
         />
         <input
-          className="mb-2 w-full rounded border p-2"
+          className="mb-2 w-full rounded border border-gray-300 p-2 hover:border-emerald-200"
           placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
         />
         <select
-          className="mb-4 w-full rounded border p-2"
+          className="mb-4 w-full rounded border border-gray-300 p-2"
           value={status}
           onChange={(e) => setStatus(e.target.value as JobStatus)}
         >
