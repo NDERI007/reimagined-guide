@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
-//import JobCard from './JobCard';
-//import JobModal from './JobModal';
-import type {JOB, JobStatus} from '../schema/types';
+import JobCard from './jobCard';
+import JobModal from './jobModal';
+import type { JOB, JobStatus } from '../schema/types';
+import { addJob } from '../api/joBReq';
 
-type JobBoardProps {
-  jobs: JOB[];
+type JobBoardProps = {
+  jobs: JOB[]; //Job is your custom type, and Job[] tells TypeScript:
+
+  //"This is an array where every element must match the Job type."
   searchQuery: string;
   statuses: JobStatus[];
-}
+};
 
 const JobBoard: React.FC<JobBoardProps> = ({ jobs, searchQuery, statuses }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSaveJob = async () => {
+  const handleSaveJob = async (Job: Omit<JOB, 'id'>) => {
     try {
-        
+      const savedJob = await addJob(Job); // sends the job to backend
+      console.log(savedJob);
+      setIsModalOpen(false);
     } catch (error) {
-        
+      console.error('Failed to save job:', error);
+      // Optionally show alert
     }
-  }
+  };
   return (
     <div>
       {/* Add Job Button */}
@@ -51,7 +57,7 @@ const JobBoard: React.FC<JobBoardProps> = ({ jobs, searchQuery, statuses }) => {
                         .includes(searchQuery.toLowerCase())),
                 )
                 .map((job) => (
-                  //<JobCard key={job.id} job={job} />
+                  <JobCard key={job.id} job={job} />
                 ))}
             </div>
           </div>
@@ -59,7 +65,12 @@ const JobBoard: React.FC<JobBoardProps> = ({ jobs, searchQuery, statuses }) => {
       </div>
 
       {/* Job Modal */}
-      {isModalOpen && <JobModal onClose={() => setIsModalOpen(false)} onSave={handleSaveJob}/>}
+      {isModalOpen && (
+        <JobModal
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveJob}
+        />
+      )}
     </div>
   );
 };
