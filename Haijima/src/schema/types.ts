@@ -9,5 +9,5 @@ export type JOB = {
   title: string;
   company: string;
   location: string;
-  status: JobStatus;
+  job_status: JobStatus;
 };

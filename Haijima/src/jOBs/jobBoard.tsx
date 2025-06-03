@@ -43,7 +43,7 @@ const JobBoard = () => {
               {jobs
                 .filter(
                   (job) =>
-                    job.status === status &&
+                    job.job_status === status &&
                     (job.title
                       .toLowerCase()
                       .includes(searchQuery.toLowerCase()) ||

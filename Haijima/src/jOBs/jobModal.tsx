@@ -8,7 +8,7 @@ const JobModal: React.FC<{
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');
   const [location, setLocation] = useState('');
-  const [status, setStatus] = useState<JobStatus>('Saved');
+  const [job_status, setStatus] = useState<JobStatus>('Saved');
 
   const handleSubmit = () => {
     // Basic validation
@@ -19,7 +19,7 @@ const JobModal: React.FC<{
 
     try {
       // Attempt to save the job
-      onSave({ title, company, location, status });
+      onSave({ title, company, location, job_status });
       onClose();
     } catch (error) {
       console.error('Failed to save job:', error);
@@ -32,25 +32,25 @@ const JobModal: React.FC<{
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold">Add New Job</h2>
         <input
-          className="mb-2 w-full rounded border border-gray-300 p-2 hover:border-emerald-200"
+          className="mb-2 w-full rounded border border-gray-300 p-2 focus-within:outline-emerald-400 hover:border-emerald-200"
           placeholder="Job Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <input
-          className="mb-2 w-full rounded border border-gray-300 p-2 hover:border-emerald-200"
+          className="mb-2 w-full rounded border border-gray-300 p-2 focus-within:outline-emerald-400 hover:border-emerald-200"
           placeholder="Company"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
         />
         <input
-          className="mb-2 w-full rounded border border-gray-300 p-2 hover:border-emerald-200"
+          className="mb-2 w-full rounded border border-gray-300 p-2 focus-within:outline-emerald-400 hover:border-emerald-200"
           placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
         />
         <select
-          className="mb-4 w-full rounded border border-gray-300 p-2"
+          className="mb-4 w-full rounded border border-gray-300 p-2 outline-none"
           value={status}
           onChange={(e) => setStatus(e.target.value as JobStatus)}
         >
@@ -64,7 +64,7 @@ const JobModal: React.FC<{
             Cancel
           </button>
           <button
-            className="rounded bg-blue-600 px-4 py-2 text-white"
+            className="rounded bg-emerald-600 px-4 py-2 text-white"
             onClick={handleSubmit}
           >
             Add Job

@@ -6,7 +6,7 @@ const JobCard: React.FC<{ job: JOB }> = ({ job }) => {
     Saved: 'bg-yellow-100 text-yellow-800',
     Interview: 'bg-blue-100 text-blue-800',
     Rejected: 'bg-red-100 text-red-800',
-  }[job.status];
+  }[job.job_status];
 
   return (
     <div className="rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md">
@@ -15,7 +15,7 @@ const JobCard: React.FC<{ job: JOB }> = ({ job }) => {
         <span
           className={`rounded-full px-3 py-1 text-sm font-medium ${statusColor}`}
         >
-          {job.status}
+          {job.job_status}
         </span>
       </div>
       <p className="text-gray-600">{job.company}</p>
