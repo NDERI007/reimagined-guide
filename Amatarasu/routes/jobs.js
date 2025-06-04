@@ -55,22 +55,29 @@ router.get("/", async (req, res) => {
   //Browser rendering time
 
   try {
-    let query = `SELECT * FROM job_tb WHERE 1=1`;
-    const values = [];
+    let query = `SELECT * FROM job_tb WHERE 1=1`; //The condition WHERE 1=1 is always true, meaning that it doesn’t filter anything yet, but it provides a base condition to which additional conditions can be added.
+    const values = []; //An empty array is initialized to hold the values that will be inserted into the query’s placeholders (?).
 
     // Add search condition (matches title, company, or location)
     if (search) {
-      const like = `%${search.trim().toLowerCase()}%`;
+      const like = `%${search.trim().toLowerCase()}%`; //The % symbols are added to make it a "like" search (similar to SQL's LIKE operator), which means the search term can appear anywhere in the column value.
+      //The ? is a placeholder, and mysql2 will safely escape and quote the value — that’s basic sanitization and guards against SQL injection.
+      //when you use the ? placeholder with mysql2, everything in the user input — even dangerous-looking SQL like '; DROP TABLE users; -- — is treated as a single safe string value, not as SQL code.
 
       query += `
         AND (
-          LOWER(title)              LIKE ?  OR
+          LOWER(title)              LIKE ?  OR 
           LOWER(company)            LIKE ?  OR
           LOWER(TRIM(COALESCE(location,''))) COLLATE utf8mb4_general_ci LIKE ?
         )`;
 
       values.push(like, like, like);
     }
+    query += ` LIMIT ? OFFSET ?`; //LIMIT n → Tells the database to return only n rows.
+
+    //OFFSET m → Tells the database to skip the first m rows before starting to return results.
+
+    values.push(limit, offset);
 
     const [jobs] = await pool.query(query, values);
     res.json(jobs);
