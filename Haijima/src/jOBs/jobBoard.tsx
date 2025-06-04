@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import JobCard from './jobCard';
 import JobModal from './jobModal';
 import { statuses, type JOB, type JobStatus } from '../schema/types';
-import { addNewJob, useJobStore } from './JobsTORE';
+import { addNewJob, loadJobs, subscribe, getJobs } from './JobsTORE';
 import { useSearchQuery } from '../components/searchStore';
 
 const JobBoard = () => {
-  const searchQuery = useSearchQuery();
+  const { query } = useSearchQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const jobs = useJobStore();
+
+  const jobs = useSyncExternalStore(subscribe, getJobs, getJobs);
+  useEffect(() => {
+    loadJobs({ search: query }); // on initial render or search change
+  }, [query]);
   const handleSaveJob = async (JoB: Omit<JOB, 'id'>) => {
     try {
       await addNewJob(JoB);
@@ -41,16 +45,15 @@ const JobBoard = () => {
             </h2>
             <div className="space-y-3">
               {jobs
-                .filter(
-                  (job) =>
+                .filter((job) => {
+                  const q = query.trim().toLowerCase();
+                  return (
                     job.job_status === status &&
-                    (job.title
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()) ||
-                      job.company
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())),
-                )
+                    (job.title.toLowerCase().includes(q) ||
+                      job.company.toLowerCase().includes(q) ||
+                      job.location.toLowerCase().includes(q))
+                  );
+                })
                 .map((job) => (
                   <JobCard key={job.id} job={job} />
                 ))}

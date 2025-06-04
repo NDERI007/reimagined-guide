@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import type { JobStatus } from '../schema/types';
+import type { JOB, JobStatus } from '../schema/types';
 
 const JobModal: React.FC<{
-  onSave: (job: Omit<any, 'id'>) => void;
+  onSave: (job: Omit<JOB, 'id'>) => void;
   onClose: () => void;
 }> = ({ onSave, onClose }) => {
   const [title, setTitle] = useState('');

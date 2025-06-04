@@ -1,15 +1,66 @@
 import axios from 'axios';
-import type { JOB } from '../schema/types';
+import type { JobStatus, JOB } from '../schema/types';
 
-const ApI_URl = import.meta.env.VITE_API_URL;
+// src/api/jobReq.ts
+// ------------------------------------------------------------
+// Centralised API helpers for Job endpoints.
+// Uses axios and TypeScript generics so the rest of the
+// application (stores / hooks / components) have a single
+// import path for every job‑related HTTP request.
+// ------------------------------------------------------------
 
-export const fetchJobs = async () => {
-  const response = await axios.get<JOB[]>(`${ApI_URl}/api/jobs`);
-  return response.data;
+// 🔧 API base – fall back to localhost in dev.
+// You can set VITE_API_URL=http://localhost:5000 in your .env files.
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+
+// Axios instance so we can add interceptors later (auth, logging …)
+const api = axios.create({ baseURL: API_BASE });
+
+// ------------------------------
+// Types for query parameters
+// ------------------------------
+export type JobQuery = {
+  search?: string; // fuzzy search term
+  status?: JobStatus | '' | 'All'; // filter by status; "All" / "" means no filter
+  page?: number; // pagination page (1‑based)
+  limit?: number; // items per page (default handled on backend)
 };
 
-export const addJob = async (job: Omit<JOB, 'id'>) => {
-  const response = await axios.post<JOB>(`${ApI_URl}/api/jobs`, job); //<JOB>: tells TypeScript what you expect to get back (usually the full job including its new ID)
-  //If you don’t pass the job, your backend has no data to save.
-  return response.data; // returns the created job
+// ------------------------------
+// Fetch jobs with optional filters & pagination
+// ------------------------------
+export const fetchJobs = async (query: JobQuery = {}): Promise<JOB[]> => {
+  const { data } = await api.get<JOB[]>('/api/jobs', { params: query });
+  return data;
 };
+
+// ------------------------------
+// Add a new job
+// ------------------------------
+export const addJob = async (job: Omit<JOB, 'id'>): Promise<JOB> => {
+  const { data } = await api.post<JOB>('/api/jobs', job);
+  return data;
+};
+
+// ------------------------------
+// Update an existing job (partial updates)
+// ------------------------------
+export const updateJob = async (
+  id: number,
+  payload: Partial<Omit<JOB, 'id'>>,
+): Promise<JOB> => {
+  const { data } = await api.put<JOB>(`/api/jobs/${id}`, payload);
+  return data;
+};
+
+// ------------------------------
+// Delete a job
+// ------------------------------
+export const deleteJob = async (id: number): Promise<void> => {
+  await api.delete(`/api/jobs/${id}`);
+};
+
+// ------------------------------------------------------------
+// Helper – pre‑configured limits for dropdowns / page sizes.
+// ------------------------------------------------------------
+export const PAGE_LIMITS = [10, 20, 50] as const;

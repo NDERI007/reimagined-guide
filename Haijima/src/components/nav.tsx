@@ -1,7 +1,7 @@
 import { setSearchQuery, useSearchQuery } from './searchStore';
 
 const Navbar = () => {
-  const searchQuery = useSearchQuery();
+  const { query } = useSearchQuery();
   return (
     <nav className="flex w-full items-center justify-between border-b bg-white px-4 py-3">
       <div className="text-xl font-bold text-teal-600">JobTracker</div>
@@ -9,7 +9,7 @@ const Navbar = () => {
       <div className="mx-4 max-w-md flex-1">
         <input
           type="text"
-          value={searchQuery}
+          value={query}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search jobs by title, company, location..."
           className="w-full rounded-md border border-gray-300 bg-gray-200 px-4 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none"

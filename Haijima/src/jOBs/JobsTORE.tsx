@@ -5,12 +5,17 @@ import { fetchJobs, addJob } from '../api/joBReq';
 
 // Internal store and subscribers
 let jobList: JOB[] = [];
+let queryParams = {
+  search: '',
+  page: 1,
+  limit: 10,
+};
 const subscribers = new Set<() => void>(); //A Set of functions (listeners) to call when the data changes — like setState, but manual.
 
 // Core store methods
-const getJobs = () => jobList;
+export const getJobs = () => jobList;
 
-const subscribe = (callback: () => void) => {
+export const subscribe = (callback: () => void) => {
   //Adds a component’s re-render function (callback) to the list.
 
   subscribers.add(callback);
@@ -21,9 +26,9 @@ const notify = () => {
   subscribers.forEach((callback) => callback()); //Notifies all subscribed components that the job list has changed by triggering re-renders.
 };
 
-const loadJobs = async () => {
-  const data = await fetchJobs();
-  jobList = data;
+export const loadJobs = async (params?: Partial<typeof queryParams>) => {
+  queryParams = { ...queryParams, ...params };
+  jobList = await fetchJobs(queryParams);
   notify();
 };
 
