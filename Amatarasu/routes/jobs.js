@@ -6,7 +6,8 @@ const router = express.Router();
 // GET all jobs
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM job_tb");
+    const [rows] = await pool.query("SELECT * FROM job_tb"); //Here, db.query() returns an array (often [rows, fields]), and we destructure to get just the rows.
+
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -25,15 +26,16 @@ router.post("/", async (req, res) => {
 
   try {
     const [result] = await pool.query(
+      //array destruc
       "INSERT INTO job_tb (title, company, location, job_status) VALUES (?, ?, ?, ?)",
       [title, company, location, job_status]
     );
 
-    const newJob = {
-      id: result.insertId,
-    };
+    const [rows] = await pool.query("SELECT * FROM job_tb where job_id = ?", [
+      result.insertId,
+    ]);
 
-    res.status(201).json(newJob);
+    res.status(201).json(rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error adding job" });
@@ -43,7 +45,7 @@ router.post("/", async (req, res) => {
 //Search and filter
 
 router.get("/", async (req, res) => {
-  const { search = "", page = 1, limit = 10 } = req.query;
+  const { search = "", page = 1, limit = 10 } = req.query; //Obj destruc It extracts values from the req.query object (or any object), and if those values are undefined, it assigns the defaults ("", 1, and 10).
   const offset = (Number(page) - 1) * Number(limit);
   //Pagination is the process of dividing a large dataset into smaller, more manageable chunks (called pages), typically for display in a UI.
   //Instead of loading 10,000 jobs at once, you load, say, 10 or 20 per page. This reduces:
@@ -80,6 +82,11 @@ router.get("/", async (req, res) => {
     values.push(limit, offset);
 
     const [jobs] = await pool.query(query, values);
+    //.query() is a method that sends a SQL command to the database.
+
+    //query is just a SQL statement string that defines what operation you want to perform on the database.
+
+    //values is an array of values to replace placeholders (?) in the SQL string safely (to prevent SQL injection).
     res.json(jobs);
   } catch (err) {
     console.error(err);

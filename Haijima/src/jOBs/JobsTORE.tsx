@@ -23,6 +23,7 @@ export const subscribe = (callback: () => void) => {
 };
 
 const notify = () => {
+  console.log('[STORE] NOTIFYING SUBS');
   subscribers.forEach((callback) => callback()); //Notifies all subscribed components that the job list has changed by triggering re-renders.
 };
 
@@ -35,6 +36,7 @@ export const loadJobs = async (params?: Partial<typeof queryParams>) => {
 const addNewJob = async (job: Omit<JOB, 'id'>) => {
   const newJob = await addJob(job);
   jobList = [...jobList, newJob];
+  console.log('[Store] Job added:', jobList); // <- this should log the new state
   notify();
 };
 

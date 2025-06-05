@@ -12,7 +12,7 @@ const JobModal: React.FC<{
 
   const handleSubmit = () => {
     // Basic validation
-    if (!title.trim() || !company.trim() || !location.trim()) {
+    if (!title.trim() || !company.trim() || !location.trim() || !job_status) {
       alert('All fields are required.');
       return;
     }
@@ -51,7 +51,7 @@ const JobModal: React.FC<{
         />
         <select
           className="mb-4 w-full rounded border border-gray-300 p-2 outline-none"
-          value={status}
+          value={job_status}
           onChange={(e) => setStatus(e.target.value as JobStatus)}
         >
           <option value="Saved">Saved</option>

@@ -1,15 +1,16 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 import JobCard from './jobCard';
 import JobModal from './jobModal';
 import { statuses, type JOB, type JobStatus } from '../schema/types';
-import { addNewJob, loadJobs, subscribe, getJobs } from './JobsTORE';
+import { addNewJob, loadJobs, useJobStore } from './JobsTORE';
 import { useSearchQuery } from '../components/searchStore';
 
 const JobBoard = () => {
   const { query } = useSearchQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const jobs = useSyncExternalStore(subscribe, getJobs, getJobs);
+  const jobs = useJobStore();
+  console.log('[Component] Rendering jobs:', jobs); // Add this line to debug
   useEffect(() => {
     loadJobs({ search: query }); // on initial render or search change
   }, [query]);
@@ -52,6 +53,8 @@ const JobBoard = () => {
                     (job.title.toLowerCase().includes(q) ||
                       job.company.toLowerCase().includes(q) ||
                       job.location.toLowerCase().includes(q))
+                    //If this line was missing (or miswritten), your UI would never match location-based searches,
+                    // even if the backend sent back correct data.
                   );
                 })
                 .map((job) => (
