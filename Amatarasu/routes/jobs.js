@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
     );
 
     const [rows] = await pool.query("SELECT * FROM job_tb where job_id = ?", [
-      result.insertId,
+      result.insertId, //This is where the problem was
     ]);
 
     res.status(201).json(rows[0]);

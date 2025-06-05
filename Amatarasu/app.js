@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import jobRoute from "./routes/jobs.js";
+import authRoute from "./routes/auth.js";
+
 const app = express();
 
 app.use(
@@ -14,7 +16,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json()); //Any JSON body will be accepted and parsed into the req.body object
 
 app.use("/api/jobs", jobRoute);
-app.use("/api/auth", jobRoute);
+app.use("/api/auth", authRoute);
 
 app.use((err, req, res, next) => {
   console.log(err.stack);
