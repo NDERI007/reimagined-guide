@@ -1,36 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import JobCard from './jobCard';
-import JobModal from './jobModal';
-import { statuses, type JOB, type JobStatus } from '../schema/types';
-import { addNewJob, loadJobs, useJobStore } from './JobsTORE';
+
+import { statuses, type JobStatus } from '../schema/types';
+import { loadJobs, useJobStore } from './JobsTORE';
 import { useSearchQuery } from '../components/searchStore';
+import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import { useOutletContext } from 'react-router-dom';
 
 const JobBoard = () => {
   const { query } = useSearchQuery();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const jobs = useJobStore();
-
+  const { openModal } = useOutletContext<{ openModal: () => void }>();
   useEffect(() => {
     loadJobs({ search: query }); // on initial render or search change
   }, [query]);
-  const handleSaveJob = async (JoB: Omit<JOB, 'id'>) => {
-    try {
-      await addNewJob(JoB);
-      // sends the job to backend
-
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error('Failed to save job:', error);
-      // Optionally show alert
-    }
-  };
   return (
     <div>
       {/* Add Job Button */}
       <div className="flex justify-end p-4">
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={openModal}
           className="rounded-md bg-teal-600 px-4 py-2 text-white hover:bg-teal-500"
         >
           Add Job
@@ -64,14 +54,6 @@ const JobBoard = () => {
           </div>
         ))}
       </div>
-
-      {/* Job Modal */}
-      {isModalOpen && (
-        <JobModal
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleSaveJob}
-        />
-      )}
     </div>
   );
 };

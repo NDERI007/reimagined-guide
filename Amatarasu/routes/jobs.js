@@ -15,6 +15,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+//Update job
+
 // POST new job
 router.post("/", async (req, res) => {
   const { title, company, location, job_status } = req.body;
