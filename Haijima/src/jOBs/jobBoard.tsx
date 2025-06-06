@@ -10,7 +10,7 @@ const JobBoard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const jobs = useJobStore();
-  console.log('[Component] Rendering jobs:', jobs); // Add this line to debug
+
   useEffect(() => {
     loadJobs({ search: query }); // on initial render or search change
   }, [query]);

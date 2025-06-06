@@ -15,7 +15,6 @@ export default function RegLog() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Hnafle submit is submittinnggg');
     setError(null);
     try {
       const url = isSignUp
