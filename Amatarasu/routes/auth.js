@@ -1,9 +1,9 @@
 // auth.js
 import { Router } from "express";
-import session from "express-session";
-import { session as _session } from "passport";
-import { pool } from "../database";
+import { pool } from "../database.js";
 import "dotenv/config";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const router = Router();
 
@@ -11,8 +11,9 @@ const router = Router();
 
 //Sign-up with email instead
 router.post("/signup", async (req, res) => {
+  console.log("Signup route hit");
   const { user_name, email, passcode } = req.body;
-  if (user_name || !email || !passcode) {
+  if (!user_name || !email || !passcode) {
     return res.status(400).json({ msg: "All fields are required" });
   }
 
@@ -26,14 +27,15 @@ router.post("/signup", async (req, res) => {
 
     const hashedpasscode = await bcrypt.hash(passcode, 10);
     await pool.query(
-      "INSERT INTO users user_name, email, passcode) VALUES (?, ?, ?)",
-      user_name,
-      email,
-      hashedpasscode
+      "INSERT INTO users (user_name, email, passcode) VALUES (?, ?, ?)",
+      [user_name, email, hashedpasscode]
     );
 
     res.status(201).json({ msg: "User created successfully" });
   } catch (err) {
+    console.error("Error occurred during signup:");
+    console.error("Request body:", req.body);
+    console.error("Error details:", err);
     res.status(500).json({ msg: "Server error", error: err });
   }
 });
@@ -46,10 +48,9 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    const [users] = await pool.query(
-      "SELECT * FROM users WHERE email = ? AND provider = 'local'",
-      [email]
-    );
+    const [users] = await pool.query("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
     if (users.length === 0) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
@@ -60,37 +61,15 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.json({ token });
+    res.status(200).json({
+      msg: "Login successful",
+      user: { id: user.id, email: user.email },
+    }); // No token
   } catch (err) {
+    console.error("Error occurred during signup:");
+    console.error("Request body:", req.body);
+    console.error("Error details:", err);
     res.status(500).json({ msg: "Server error", error: err });
-  }
-});
-
-// Protected route
-router.get("/profile", (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ msg: "Missing token" });
-
-  try {
-    const decoded = jwt.verify(
-      //This decodes and verifies the JWT:
-
-      //Checks the token’s signature using your secret
-
-      //Checks for token expiration (exp)
-
-      authHeader.split(" ")[1], //This splits the string "Bearer <token>" into: ["Bearer", "<token>"] split(" ")[1] grabs the actual token part (<token>).
-      process.env.JWT_SECRET
-    );
-    res.json({ msg: "Welcome!", user: decoded });
-  } catch (err) {
-    res.status(401).json({ msg: "Invalid token" });
   }
 });
 

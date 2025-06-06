@@ -13,11 +13,13 @@ export default function RegLog() {
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_URL;
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Hnafle submit is submittinnggg');
     setError(null);
     try {
       const url = isSignUp
-        ? `${API_BASE}'/api/auth/signup`
+        ? `${API_BASE}/api/auth/signup`
         : `${API_BASE}/api/auth/login`;
 
       const payload = isSignUp
@@ -25,11 +27,13 @@ export default function RegLog() {
         : { email, passcode };
 
       const res = await axios.post(url, payload);
-      localStorage.setItem('token', res.data.token);
-      navigate('/');
+      console.log('payload', payload);
+      if (res.status === 200 || res.status === 201) {
+        navigate('/jobBoard'); // Redirect on successful login or signup
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        const message = (err.response?.data as { message?: string })?.message;
+        const message = (err.response?.data as { msg?: string })?.msg;
         setError(message || 'Authentication failed');
       } else {
         setError('Something went wrong');
@@ -40,6 +44,9 @@ export default function RegLog() {
 
   useEffect(() => {
     // Focus on the first input when form mode changes
+
+    console.log('RegLog component mounted');
+
     firstInputRef.current?.focus();
   }, []);
 

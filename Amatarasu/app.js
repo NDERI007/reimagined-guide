@@ -9,6 +9,7 @@ app.use(
   cors({
     origin: "http://localhost:5173", // your React frontend
     methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
