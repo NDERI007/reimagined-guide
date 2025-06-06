@@ -5,7 +5,7 @@ import axios from 'axios';
 export function useAuth() {
   const [user, setUser] = useState<{
     id: number;
-    user_name: string;
+    email: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const API_BASE = import.meta.env.VITE_API_URL;

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../schema/useAuth';
 import { setSearchQuery, useSearchQuery } from './searchStore';
+import { LogOut } from 'lucide-react';
 
 const Navbar = () => {
   const { query } = useSearchQuery();
@@ -26,11 +27,12 @@ const Navbar = () => {
 
       <div className="flex items-center space-x-3">
         <span className="text-sm font-medium">Welcome Twin</span>
-
-        <img className="h-10 w-10 rounded-full border" />
       </div>
-      <button onClick={handleLogout} className="rounded bg-red-500 px-3 py-1">
-        Logout
+      <button
+        onClick={handleLogout}
+        className="flex cursor-pointer items-center px-3 py-1"
+      >
+        <LogOut size={20} /> Logout
       </button>
     </nav>
   );

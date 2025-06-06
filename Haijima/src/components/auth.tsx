@@ -27,6 +27,7 @@ export default function RegLog() {
 
       const res = await axios.post(url, payload);
       localStorage.setItem('token', res.data.token);
+      console.log(localStorage.setItem('token', res.data.token));
 
       navigate('/jobBoard'); // Redirect on successful login or signup
     } catch (err) {
@@ -42,9 +43,6 @@ export default function RegLog() {
 
   useEffect(() => {
     // Focus on the first input when form mode changes
-
-    console.log('RegLog component mounted');
-
     firstInputRef.current?.focus();
   }, []);
 

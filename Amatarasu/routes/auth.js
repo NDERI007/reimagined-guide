@@ -73,8 +73,9 @@ router.post("/login", async (req, res) => {
 
     res.status(200).json({
       msg: "Login successful",
-      user: { id: user.id, email: user.email, token },
-    }); // No token
+      user: { id: user.id, email: user.email },
+      token,
+    });
   } catch (err) {
     console.error("Error occurred during signup:");
     console.error("Request body:", req.body);
