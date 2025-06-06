@@ -5,6 +5,7 @@ import RegLog from '../components/auth';
 import Navbar from '../components/nav';
 import JobBoard from '../jOBs/jobBoard';
 import { JobProvider } from '../jOBs/JobsTORE';
+import ProtectedRoute from '../components/protectedRoute';
 
 const routes: RouteObject[] = [
   { path: '/', element: <Navigate to="/auth" /> },
@@ -13,10 +14,12 @@ const routes: RouteObject[] = [
   {
     path: '/jobboard',
     element: (
-      <JobProvider>
-        <Navbar />
-        <JobBoard />
-      </JobProvider>
+      <ProtectedRoute>
+        <JobProvider>
+          <Navbar />
+          <JobBoard />
+        </JobProvider>
+      </ProtectedRoute>
     ),
   },
 ];

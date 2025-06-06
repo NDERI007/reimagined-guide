@@ -27,10 +27,9 @@ export default function RegLog() {
         : { email, passcode };
 
       const res = await axios.post(url, payload);
-      console.log('payload', payload);
-      if (res.status === 200 || res.status === 201) {
-        navigate('/jobBoard'); // Redirect on successful login or signup
-      }
+      localStorage.setItem('token', res.data.token);
+
+      navigate('/jobBoard'); // Redirect on successful login or signup
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const message = (err.response?.data as { msg?: string })?.msg;

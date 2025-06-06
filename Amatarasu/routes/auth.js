@@ -26,12 +26,17 @@ router.post("/signup", async (req, res) => {
     }
 
     const hashedpasscode = await bcrypt.hash(passcode, 10);
-    await pool.query(
+    const [newUser] = await pool.query(
       "INSERT INTO users (user_name, email, passcode) VALUES (?, ?, ?)",
       [user_name, email, hashedpasscode]
     );
 
-    res.status(201).json({ msg: "User created successfully" });
+    const token = jwt.sign(
+      { id: newUser.insertId, email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1hr" }
+    );
+    res.status(201).json({ msg: "User created successfully", token });
   } catch (err) {
     console.error("Error occurred during signup:");
     console.error("Request body:", req.body);
@@ -60,10 +65,15 @@ router.post("/login", async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.status(200).json({
       msg: "Login successful",
-      user: { id: user.id, email: user.email },
+      user: { id: user.id, email: user.email, token },
     }); // No token
   } catch (err) {
     console.error("Error occurred during signup:");
