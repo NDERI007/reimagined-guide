@@ -1,47 +1,47 @@
 // src/components/ModalWrapper.tsx
-import React, { type ReactNode, useRef, useEffect } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface ModalWrapperProps {
+type ModalWrapperProps = {
   children: ReactNode;
   onOutsideClick: () => void;
-}
+};
 
-export const ModalWrapper: React.FC<ModalWrapperProps> = ({
+const ModalWrapper: React.FC<ModalWrapperProps> = ({
   children,
   onOutsideClick,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Close modal if user clicks outside of modal content
-  const handleClickOutside = (e: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onOutsideClick();
-    }
-  };
-
-  // Add event listener for outside click on mount
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onOutsideClick();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onOutsideClick]);
 
   return createPortal(
-    <motion.div
-      className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div
-        ref={modalRef}
-        className="w-full max-w-md overflow-hidden rounded-lg bg-white p-6 shadow-lg"
+    <AnimatePresence mode="wait">
+      <motion.div
+        className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+        key="modal"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onOutsideClick}
       >
-        {children}
-      </div>
-    </motion.div>,
+        {/* 👇 Remove internal box — delegate to children */}
+        <div ref={modalRef} onClick={(e) => e.stopPropagation()}>
+          {children}
+        </div>
+      </motion.div>
+    </AnimatePresence>,
     document.body,
   );
 };
+
+export default ModalWrapper;
