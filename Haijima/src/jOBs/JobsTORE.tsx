@@ -1,7 +1,7 @@
 // JobStore.tsx
 import React, { useRef } from 'react'; // useRef is used to avoid re-running logic.
-import type { JOB } from '../schema/types';
-import { fetchJobs, addJob } from '../api/joBReq';
+import type { JOB, JobStatus } from '../schema/types';
+import { fetchJobs, addJob, updateJobStatus } from '../api/joBReq';
 
 // Internal store and subscribers
 let jobList: JOB[] = [];
@@ -31,6 +31,28 @@ export const loadJobs = async (params?: Partial<typeof queryParams>) => {
   queryParams = { ...queryParams, ...params };
   jobList = await fetchJobs(queryParams);
   notify();
+};
+
+// Update job status locally (without needing to make a server call immediately)
+export const updateJobStatusLocally = (id: number, job_status: JobStatus) => {
+  jobList = jobList.map((job) =>
+    job.id === id ? { ...job, job_status: job_status } : job,
+  );
+  notify(); // Notify components to re-render
+};
+
+// Update job status on the server and locally
+export const updateJobStatusAndLocally = async (
+  id: number,
+  job_status: JobStatus,
+) => {
+  try {
+    await updateJobStatus(id, job_status); // Update on the server
+    updateJobStatusLocally(id, job_status); // Update locally
+  } catch (err) {
+    console.error('Error updating job status', err);
+    throw new Error('Failed to update job status');
+  }
 };
 
 const addNewJob = async (job: Omit<JOB, 'id'>) => {

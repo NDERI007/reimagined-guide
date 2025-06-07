@@ -16,6 +16,39 @@ router.get("/", async (req, res) => {
 });
 
 //Update job
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { job_status } = req.body;
+
+  if (!job_status) {
+    return res.status(400).json({ error: "job_status is required" });
+  }
+
+  try {
+    // Check if job exists
+    const [rows] = await db.execute("SELECT * FROM job_tb WHERE id = ?", [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Job not found" });
+    }
+
+    // Update job_status
+    await db.execute("UPDATE job_tb SET job_status = ? WHERE id = ?", [
+      job_status,
+      id,
+    ]);
+
+    // Get updated job
+    const [updatedRows] = await db.execute(
+      "SELECT * FROM job_tb WHERE id = ?",
+      [id]
+    );
+
+    res.json({ message: "Job status updated", job: updatedRows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update job status" });
+  }
+});
 
 // POST new job
 router.post("/", async (req, res) => {

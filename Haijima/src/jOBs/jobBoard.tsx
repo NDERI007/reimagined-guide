@@ -4,7 +4,7 @@ import JobCard from './jobCard';
 import { statuses, type JobStatus } from '../schema/types';
 import { loadJobs, useJobStore } from './JobsTORE';
 import { useSearchQuery } from '../components/searchStore';
-import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+
 import { useOutletContext } from 'react-router-dom';
 
 const JobBoard = () => {

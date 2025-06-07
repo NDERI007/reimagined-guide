@@ -45,12 +45,18 @@ export const addJob = async (job: Omit<JOB, 'id'>): Promise<JOB> => {
 // ------------------------------
 // Update an existing job (partial updates)
 // ------------------------------
-export const updateJob = async (
-  id: number,
-  payload: Partial<Omit<JOB, 'id'>>,
-): Promise<JOB> => {
-  const { data } = await api.put<JOB>(`/api/jobs/${id}`, payload);
-  return data;
+export const updateJobStatus = async (id: number, job_status: JobStatus) => {
+  try {
+    const { data } = await axios.patch(`/api/jobs/${id}`, {
+      job_status,
+    });
+
+    return data.job; // optional: return updated job object
+  } catch (err: any) {
+    const errorMsg = err.response?.data?.error || 'Failed to update job status';
+    console.error('[updateJobStatus]', errorMsg);
+    throw new Error(errorMsg);
+  }
 };
 
 // ------------------------------
