@@ -1,20 +1,55 @@
 import { useEffect } from 'react';
 import JobCard from './jobCard';
-
 import { statuses, type JobStatus } from '../schema/types';
-import { loadJobs, useJobStore } from './JobsTORE';
+import { loadJobs, useJobStore, updateJobStatusAndLocally } from './JobsTORE';
 import { useSearchQuery } from '../components/searchStore';
-
 import { useOutletContext } from 'react-router-dom';
+
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { Droppable } from '../components/Drop';
+import Draggable from '../components/dRAG';
 
 const JobBoard = () => {
   const { query } = useSearchQuery();
-
   const jobs = useJobStore();
   const { openModal } = useOutletContext<{ openModal: () => void }>();
+
   useEffect(() => {
-    loadJobs({ search: query }); // on initial render or search change
+    loadJobs({ search: query });
   }, [query]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    console.log('DRAGGED:', { activeId: active.id });
+
+    if (!active || !over || active.id === over.id) return;
+
+    const jobIdsrt = active.id as string;
+    const newStatus = over.id as JobStatus;
+    const jobId = parseInt(jobIdsrt, 10);
+    if (isNaN(jobId)) return;
+
+    const job = jobs.find((j) => j.job_id === jobId);
+    if (job && job.job_status !== newStatus) {
+      try {
+        await updateJobStatusAndLocally(jobId, newStatus);
+      } catch (err) {
+        alert('Failed to update job status');
+      }
+    }
+  };
+
   return (
     <div>
       {/* Add Job Button */}
@@ -28,32 +63,40 @@ const JobBoard = () => {
       </div>
 
       {/* Job Columns */}
-      <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
-        {statuses.map((status: JobStatus) => (
-          <div key={status} className="rounded-xl bg-gray-50 p-4 shadow-sm">
-            <h2 className="mb-4 text-xl font-semibold text-gray-700">
-              {status} Jobs
-            </h2>
-            <div className="space-y-3">
-              {jobs
-                .filter((job) => {
-                  const q = query.trim().toLowerCase();
-                  return (
-                    job.job_status === status &&
-                    (job.title.toLowerCase().includes(q) ||
-                      job.company.toLowerCase().includes(q) ||
-                      job.location.toLowerCase().includes(q))
-                    //If this line was missing (or miswritten), your UI would never match location-based searches,
-                    // even if the backend sent back correct data.
-                  );
-                })
-                .map((job) => (
-                  <JobCard key={job.id} job={job} />
-                ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+          {statuses.map((status: JobStatus) => (
+            <Droppable key={status} id={status}>
+              <div className="min-h-[300px] rounded-xl bg-gray-50 p-4 shadow-sm">
+                <h2 className="mb-4 text-xl font-semibold text-gray-700">
+                  {status} Jobs
+                </h2>
+                <div className="space-y-3">
+                  {jobs
+                    .filter((job) => {
+                      const q = query.trim().toLowerCase();
+                      return (
+                        job.job_status === status &&
+                        (job.title.toLowerCase().includes(q) ||
+                          job.company.toLowerCase().includes(q) ||
+                          job.location.toLowerCase().includes(q))
+                      );
+                    })
+                    .map((job) => (
+                      <Draggable key={job.job_id} id={String(job.job_id)}>
+                        <JobCard job={job} />
+                      </Draggable>
+                    ))}
+                </div>
+              </div>
+            </Droppable>
+          ))}
+        </div>
+      </DndContext>
     </div>
   );
 };
