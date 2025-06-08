@@ -47,7 +47,7 @@ export const addJob = async (job: Omit<JOB, 'id'>): Promise<JOB> => {
 // ------------------------------
 export const updateJobStatus = async (id: number, job_status: JobStatus) => {
   try {
-    const { data } = await axios.patch(`/api/jobs/${id}`, {
+    const { data } = await api.patch(`/api/jobs/${id}`, {
       job_status,
     });
 

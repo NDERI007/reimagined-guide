@@ -43,7 +43,7 @@ const JobBoard = () => {
     const job = jobs.find((j) => j.job_id === jobId);
     if (job && job.job_status !== newStatus) {
       try {
-        await updateJobStatusAndLocally(jobId, newStatus);
+        await updateJobStatusAndLocally(job.job_id, newStatus);
       } catch (err) {
         alert('Failed to update job status');
       }

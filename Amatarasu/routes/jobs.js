@@ -1,12 +1,12 @@
 import express from "express";
-import { pool } from "../database.js"; // assumed db connection
+import { pool } from "../database.js"; // assumed pool connection
 
 const router = express.Router();
 
 // GET all jobs
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM job_tb"); //Here, db.query() returns an array (often [rows, fields]), and we destructure to get just the rows.
+    const [rows] = await pool.query("SELECT * FROM job_tb"); //Here, pool.query() returns an array (often [rows, fields]), and we destructure to get just the rows.
 
     res.json(rows);
   } catch (err) {
@@ -17,29 +17,34 @@ router.get("/", async (req, res) => {
 
 //Update job
 router.patch("/:id", async (req, res) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
   const { job_status } = req.body;
 
+  if (isNaN(id)) {
+    return res.status(400).json({ error: "Invalid Job ID" });
+  }
   if (!job_status) {
     return res.status(400).json({ error: "job_status is required" });
   }
 
   try {
     // Check if job exists
-    const [rows] = await db.execute("SELECT * FROM job_tb WHERE id = ?", [id]);
+    const [rows] = await pool.execute("SELECT * FROM job_tb WHERE job_id = ?", [
+      id,
+    ]);
     if (rows.length === 0) {
       return res.status(404).json({ error: "Job not found" });
     }
 
     // Update job_status
-    await db.execute("UPDATE job_tb SET job_status = ? WHERE id = ?", [
+    await pool.execute("UPDATE job_tb SET job_status = ? WHERE job_id = ?", [
       job_status,
       id,
     ]);
 
     // Get updated job
-    const [updatedRows] = await db.execute(
-      "SELECT * FROM job_tb WHERE id = ?",
+    const [updatedRows] = await pool.execute(
+      "SELECT * FROM job_tb WHERE job_id = ?",
       [id]
     );
 

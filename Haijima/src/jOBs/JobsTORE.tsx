@@ -36,7 +36,7 @@ export const loadJobs = async (params?: Partial<typeof queryParams>) => {
 // Update job status locally (without needing to make a server call immediately)
 export const updateJobStatusLocally = (id: number, job_status: JobStatus) => {
   jobList = jobList.map((job) =>
-    job.id === id ? { ...job, job_status: job_status } : job,
+    job.job_id === id ? { ...job, job_status: job_status } : job,
   );
   notify(); // Notify components to re-render
 };
