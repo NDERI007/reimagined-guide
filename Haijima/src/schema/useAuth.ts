@@ -37,7 +37,7 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [API_BASE]);
 
   // Auto validate on mount
   useEffect(() => {

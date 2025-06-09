@@ -45,7 +45,7 @@ const JobBoard = () => {
       try {
         await updateJobStatusAndLocally(job.job_id, newStatus);
       } catch (err) {
-        alert('Failed to update job status');
+        console.error('Failed to update job status', err);
       }
     }
   };
